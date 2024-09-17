@@ -17,5 +17,5 @@ npm install ethers
 ## Run
 
 ```sh
-npx esrun confirmedTx
+npm run dev
 ```
