@@ -42,7 +42,7 @@ async function getTokenDetails(tokenAddress: string) {
 async function fetchConfirmedTx() {
   const txhash =
     // "0x2f6ff1f6230bff664cd5d3701611f61758fb482a295ec70ddb48ea706e50d3fa"; // Three tokens path
-    "0xbc4f5a06c3bdee8438c64ccd9b50f5ec79b4d0218fc6fdf5ffc6747568e4aa16"; // TOMMY
+    "0x4232b1f580cc1e7a597364a83efe99053255a14c5384f8224745e2124be8d2d5"; // TOMMY
   // "0xd001258f9e03b1486bf0b2f5ae626cff11bb68b74ee7e370f2c1293473a2f844"; // Jared bot
   const tx = await provider.getTransaction(txhash);
   if (tx) {
@@ -58,6 +58,7 @@ async function fetchConfirmedTx() {
     const swapLogs = receipt?.logs.filter(
       (log) => log.topics[0] === swapEventTopic
     );
+
     if (transferLogs && swapLogs) {
       const token0Address = transferLogs[0].address;
       const token1Address = transferLogs[transferLogs?.length - 1].address;
@@ -68,11 +69,17 @@ async function fetchConfirmedTx() {
       ]);
 
       const amountA =
-        Number(swapIface.parseLog(swapLogs[0])?.args[1]) /
-        Number(Math.pow(10, Number(tokenA.decimals)));
+        Number(swapIface.parseLog(swapLogs[0])?.args[1]) === 0
+          ? Number(swapIface.parseLog(swapLogs[0])?.args[2]) /
+            Number(Math.pow(10, Number(tokenA.decimals)))
+          : Number(swapIface.parseLog(swapLogs[0])?.args[1]) /
+            Number(Math.pow(10, Number(tokenA.decimals)));
       const amountB =
-        Number(swapIface.parseLog(swapLogs[swapLogs.length - 1])?.args[4]) /
-        Number(Math.pow(10, Number(tokenB.decimals)));
+        Number(swapIface.parseLog(swapLogs[swapLogs.length - 1])?.args[4]) === 0
+          ? Number(swapIface.parseLog(swapLogs[swapLogs.length - 1])?.args[3]) /
+            Number(Math.pow(10, Number(tokenB.decimals)))
+          : Number(swapIface.parseLog(swapLogs[swapLogs.length - 1])?.args[4]) /
+            Number(Math.pow(10, Number(tokenB.decimals)));
 
       console.log(`✅ Swap Detected!`);
       console.log(
